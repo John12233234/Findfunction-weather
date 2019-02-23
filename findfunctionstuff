@@ -1,0 +1,67 @@
+void find(GtkWidget *widget, ezgl::application *application){
+     
+    std::string strname1;
+    std::string strname2; //use readline to read information
+    std::cout<<"enter street name1"<<std::endl;
+    getline(std::cin,strname1); //using getline so that we can include white space
+    std::cout<<"enter street name2"<<std::endl;
+    getline(std::cin,strname2);
+    std::cout<<std::endl;
+    
+    std::vector<unsigned> partials1(find_street_ids_from_partial_street_name(strname1)); //find every possible street that could match what the user put in 
+    std::vector<unsigned> partials2(find_street_ids_from_partial_street_name(strname2)); //using the partial street names function
+    
+    
+    
+    for(unsigned firststrIDs = 0; firststrIDs < partials1.size();firststrIDs++){ //go through every possible street for the first user input
+        for(unsigned secstrIDs= 0; secstrIDs<partials2.size();secstrIDs++){ //match that every possible street for the second user input
+            if(!find_intersection_ids_from_street_ids(partials1[firststrIDs],partials2[secstrIDs]).empty()){ //check if the two streets actually have common intersections
+                intersectionID.resize(find_intersection_ids_from_street_ids(partials1[firststrIDs],partials2[secstrIDs]).size()); //initialize the common intersections array
+                intersectionID = find_intersection_ids_from_street_ids(partials1[firststrIDs],partials2[secstrIDs]);//with those intersections
+            }
+        }
+      //  if(find_intersection_ids_from_street_ids(partials1[firststrIDs],partials2[secstrIDs]).empty())
+            
+    }
+    
+    if(intersectionID.size() == 0)
+        std::cout<<"Street Intersection Not Found"<<std::endl; 
+    //now go through and make a vector of structs to highlight the information
+    if(!intersectionID.empty()){ //Now that we have found the common intersections
+    for(int intID = 0;intID<intersectionID.size();intID++){ //go through the intersections vector and match their coordinates with the coordinates of the intersections in the 
+        for(int intID1 = 0;intID1<intersections.size();intID1++){//common intersections
+            if(getIntersectionPosition(intersectionID[intID]).lat() == intersections[intID1].position.lat() && getIntersectionPosition(intersectionID[intID]).lon() == intersections[intID1].position.lon()){
+                intersections[intID1].located = true; //the located boolean indicates that the common intersection should be highlighted on the map 
+                 
+                
+            }
+        }
+    }
+    //application->refresh_drawing();
+ }
+     
+ }
+ 
+ void initial_setup(ezgl::application *application){
+  // Update the status bar message
+  application->update_message("EZGL Application");
+
+  // Create a Test button and link it with test_button callback fn.
+  application->create_button("find", 7,find);
+  
+  
+}
+
+struct intersection_data {
+    LatLon position;
+    std::string name;
+    
+    //only true if the intersection has been clicked
+    bool highlight = false;
+    bool located = false;
+}; 
+
+
+
+ 
+ 
